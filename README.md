@@ -1,2 +1,2 @@
 # UnityMultiplayerARPG_Vivox
-A Vivox implementation example for MMORPG KIT project
+A Vivox integration example for MMORPG KIT project
