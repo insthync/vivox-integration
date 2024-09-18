@@ -1,4 +1,4 @@
-namespace MultiplayerARPG
+namespace Insthync.UnityVivoxIntegration
 {
     public enum VivoxChannelType
     {

@@ -1,4 +1,4 @@
-namespace MultiplayerARPG
+namespace Insthync.UnityVivoxIntegration
 {
     public static class VivoxExtensions
     {

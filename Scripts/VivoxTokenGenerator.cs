@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 
-namespace MultiplayerARPG
+namespace Insthync.UnityVivoxIntegration
 {
     /// <summary>
     /// This did follow: https://docs.unity.com/ugs/en-us/manual/vivox-unity/manual/access-token-guide/generate-token-secure-server/example-c-sharp
