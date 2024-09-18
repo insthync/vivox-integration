@@ -1,2 +1,2 @@
 # vivox-integration
-A Simple Vivox integration for any Unity game project
+A simple Vivox integration for any Unity game project
