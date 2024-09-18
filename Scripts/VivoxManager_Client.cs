@@ -1,33 +1,16 @@
 #if !UNITY_SERVER
-using System;
-using System.Threading.Tasks;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
 
 namespace Insthync.UnityVivoxIntegration
 {
-    public partial class VivoxManager : IVivoxTokenProvider
+    public partial class VivoxManager
     {
         private async void InitializeForClient()
         {
-            var options = new InitializationOptions();
-            if (CheckManualCredentials())
-            {
-                options.SetVivoxCredentials(_server, _domain, _issuer, _key);
-            }
-            VivoxService.Instance.SetTokenProvider(this);
-            await UnityServices.InitializeAsync(options);
+            await UnityServices.InitializeAsync();
+            VivoxService.Instance.SetTokenProvider(GetComponent<IVivoxTokenProvider>());
             await VivoxService.Instance.InitializeAsync();
-        }
-
-        private bool CheckManualCredentials()
-        {
-            return !(string.IsNullOrWhiteSpace(_issuer) && string.IsNullOrWhiteSpace(_domain) && string.IsNullOrWhiteSpace(_server));
-        }
-
-        public Task<string> GetTokenAsync(string issuer = null, TimeSpan? expiration = null, string targetUserUri = null, string action = null, string channelUri = null, string fromUserUri = null, string realm = null)
-        {
-            throw new NotImplementedException();
         }
 
         public void ToggleMicrophone()
