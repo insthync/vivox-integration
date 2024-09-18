@@ -11,40 +11,19 @@ namespace MultiplayerARPG
     /// User SIP generate as `sip:.issuer.userid.@domain`
     /// Channel SIP generate as `sip:confctl-[g/d/e]-issuer.channelid@domain`
     /// </summary>
-    public static class VivoxTokenGenerator
+    public class VivoxTokenGenerator
     {
-        public enum ChannelType
-        {
-            NonPositional,
-            Positional,
-            Echo,
-        }
-
-        public static string GetSIP(this ChannelType channelType)
-        {
-            switch (channelType)
-            {
-                case ChannelType.NonPositional:
-                    return "confctl-g-";
-                case ChannelType.Positional:
-                    return "confctl-d-";
-                case ChannelType.Echo:
-                    return "confctl-e-";
-            }
-            return "confctl-g-";
-        }
-
         public static string GetUserSIP(string domain, string issuer, string userId)
         {
             return $"sip:.{issuer}.{userId}.@{domain}";
         }
 
-        public static string GetChannelSIP(string domain, string issuer, ChannelType channelType, string channelId)
+        public static string GetChannelSIP(string domain, string issuer, VivoxChannelType channelType, string channelId)
         {
             return $"sip:{channelType.GetSIP()}{issuer}.{channelId}@{domain}";
         }
 
-        public static string GenerateLoginToken(string domain, string issuer, string key, string userId, int expirationInSeconds = 3600)
+        public static string GenerateLoginToken(string domain, string issuer, string key, string userId, int expirationInSeconds = 90)
         {
             string vxa = "login";
             uint vxi = 0;
@@ -54,7 +33,7 @@ namespace MultiplayerARPG
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
-        public static string GenerateJoinToken(string domain, string issuer, string key, string userId, ChannelType channelType, string channelId, int expirationInSeconds = 3600)
+        public static string GenerateJoinToken(string domain, string issuer, string key, string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             string vxa = "join";
             uint vxi = 0;
@@ -64,7 +43,7 @@ namespace MultiplayerARPG
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
-        public static string GenerateJoinMutedToken(string domain, string issuer, string key, string userId, ChannelType channelType, string channelId, int expirationInSeconds = 3600)
+        public static string GenerateJoinMutedToken(string domain, string issuer, string key, string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             string vxa = "join_muted";
             uint vxi = 0;
@@ -74,7 +53,7 @@ namespace MultiplayerARPG
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
-        public static string GenerateKickToken(string domain, string issuer, string key, string userId, ChannelType channelType, string kickedUserId, string channelId, int expirationInSeconds = 3600)
+        public static string GenerateKickToken(string domain, string issuer, string key, string userId, string kickedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             string vxa = "kick";
             uint vxi = 0;
@@ -84,7 +63,7 @@ namespace MultiplayerARPG
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
-        public static string GenerateMuteToken(string domain, string issuer, string key, string userId, ChannelType channelType, string mutedUserId, string channelId, int expirationInSeconds = 3600)
+        public static string GenerateMuteToken(string domain, string issuer, string key, string userId, string mutedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             string vxa = "mute";
             uint vxi = 0;
@@ -94,7 +73,7 @@ namespace MultiplayerARPG
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
-        public static string GenerateVivoxAccessToken(string issuer, string key, string vxa, uint vxi, string f, string t, string sub, int expirationInSeconds = 3600)
+        public static string GenerateVivoxAccessToken(string issuer, string key, string vxa, uint vxi, string f, string t, string sub, int expirationInSeconds = 90)
         {
             List<string> segments = new List<string>();
             // Header is static - base64url encoded {} - Can also be defined as a constant "e30"
