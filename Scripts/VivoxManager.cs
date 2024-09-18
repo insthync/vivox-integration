@@ -5,13 +5,13 @@ namespace Insthync.UnityVivoxIntegration
     public partial class VivoxManager : MonoBehaviour
     {
         [SerializeField]
-        private string _server = "https://unity.vivox.com/appconfig/18966-megac-31133-udash";
+        private string _server = "";
         [SerializeField]
-        private string _domain = "mtu1xp.vivox.com";
+        private string _domain = "";
         [SerializeField]
-        private string _issuer = "18966-megac-31133-udash";
+        private string _issuer = "";
         [SerializeField]
-        private string _key = "A7e1Dwxhp1eKboFvj92aNbQkcFuJgF0c";
+        private string _key = "";
 
         // Check to see if we're about to be destroyed.
         static object m_Lock = new object();
