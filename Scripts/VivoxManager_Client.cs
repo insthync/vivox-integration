@@ -1,4 +1,6 @@
-#if !UNITY_SERVER
+#if UNITY_EDITOR || !UNITY_SERVER
+using System.Threading.Tasks;
+using UnityEngine;
 using Unity.Services.Core;
 using Unity.Services.Vivox;
 
@@ -6,27 +8,57 @@ namespace Insthync.UnityVivoxIntegration
 {
     public partial class VivoxManager
     {
-        private async void InitializeForClient()
+        public const string PERMISSION_RECORD_AUDIO = "android.permission.RECORD_AUDIO";
+        protected bool _isInitializingClient;
+        protected bool _isInitializedClient;
+
+        public async Task InitializeForClient()
         {
-            await UnityServices.InitializeAsync();
-            VivoxService.Instance.SetTokenProvider(GetComponent<IVivoxTokenProvider>());
-            await VivoxService.Instance.InitializeAsync();
+            if (_isInitializedClient || _isInitializingClient)
+                return;
+            _isInitializingClient = true;
+            VivoxConfig config = GetComponent<VivoxConfig>();
+            if (config != null)
+            {
+                await config.LoadClient();
+                _server = config.Server;
+                _domain = config.Domain;
+                _issuer = config.Issuer;
+            }
+            var options = new InitializationOptions();
+            options.SetVivoxCredentials(_server, _domain, _issuer);
+            do
+            {
+                try
+                {
+                    await UnityServices.InitializeAsync(options);
+                    await VivoxService.Instance.InitializeAsync();
+                    break;
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogException(ex);
+                    await Task.Delay(1000);
+                }
+            } while (true);
+            _isInitializingClient = false;
+            _isInitializedClient = true;
         }
 
         public void ToggleMicrophone()
         {
             if (VivoxService.Instance.IsInputDeviceMuted)
-                VivoxService.Instance.UnmuteInputDevice();
+                UnmuteMicrophone();
             else
-                VivoxService.Instance.MuteInputDevice();
+                MuteMicrophone();
         }
 
         public void ToggleSpeaker()
         {
             if (VivoxService.Instance.IsOutputDeviceMuted)
-                VivoxService.Instance.UnmuteOutputDevice();
+                UnmuteSpeaker();
             else
-                VivoxService.Instance.MuteOutputDevice();
+                MuteSpeaker();
         }
 
         public void MuteMicrophone()
@@ -36,7 +68,24 @@ namespace Insthync.UnityVivoxIntegration
 
         public void UnmuteMicrophone()
         {
+            if (!Application.HasUserAuthorization(UserAuthorization.Microphone))
+            {
+                RequestMicrophonePermissionToUnmute();
+                return;
+            }
             VivoxService.Instance.UnmuteInputDevice();
+        }
+
+        private void RequestMicrophonePermissionToUnmute()
+        {
+            AsyncOperation asyncOp = Application.RequestUserAuthorization(UserAuthorization.Microphone);
+            asyncOp.completed += AsyncOp_completed_Unmute;
+        }
+
+        private void AsyncOp_completed_Unmute(AsyncOperation asyncOp)
+        {
+            asyncOp.completed -= AsyncOp_completed_Unmute;
+            UnmuteMicrophone();
         }
 
         public void MuteSpeaker()

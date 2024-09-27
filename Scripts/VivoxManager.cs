@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Insthync.UnityVivoxIntegration
@@ -16,6 +17,9 @@ namespace Insthync.UnityVivoxIntegration
         // Check to see if we're about to be destroyed.
         static object m_Lock = new object();
         static VivoxManager m_Instance;
+
+        protected bool _isInitializingServer;
+        protected bool _isInitializedServer;
 
         /// <summary>
         /// Access singleton instance through this propriety.
@@ -55,9 +59,24 @@ namespace Insthync.UnityVivoxIntegration
                     "Multiple VivoxManager detected in the scene. Only one VivoxManager can exist at a time. The duplicate VivoxManager will be destroyed.");
                 Destroy(this);
             }
-#if !UNITY_SERVER
-            InitializeForClient();
-#endif
+        }
+
+        public async Task InitializeForServer()
+        {
+            if (_isInitializedServer || _isInitializingServer)
+                return;
+            _isInitializingServer = true;
+            VivoxConfig config = GetComponent<VivoxConfig>();
+            if (config != null)
+            {
+                await config.LoadServer();
+                _server = config.Server;
+                _domain = config.Domain;
+                _issuer = config.Issuer;
+                _key = config.Key;
+            }
+            _isInitializingServer = false;
+            _isInitializedServer = true;
         }
 
         public string GenerateLoginToken(string userId, int expirationInSeconds = 90)
@@ -70,9 +89,19 @@ namespace Insthync.UnityVivoxIntegration
             return VivoxTokenGenerator.GenerateJoinToken(_domain, _issuer, _key, userId, channelType, channelId, expirationInSeconds);
         }
 
+        public string GenerateJoinToken(string userId, string channelUri, int expirationInSeconds = 90)
+        {
+            return VivoxTokenGenerator.GenerateJoinToken(_domain, _issuer, _key, userId, channelUri, expirationInSeconds);
+        }
+
         public string GenerateJoinMutedToken(string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             return VivoxTokenGenerator.GenerateJoinMutedToken(_domain, _issuer, _key, userId, channelType, channelId, expirationInSeconds);
+        }
+
+        public string GenerateJoinMutedToken(string userId, string channelUri, int expirationInSeconds = 90)
+        {
+            return VivoxTokenGenerator.GenerateJoinMutedToken(_domain, _issuer, _key, userId, channelUri, expirationInSeconds);
         }
 
         public string GenerateKickToken(string userId, string kickedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
@@ -83,6 +112,16 @@ namespace Insthync.UnityVivoxIntegration
         public string GenerateMuteToken(string userId, string mutedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             return VivoxTokenGenerator.GenerateMuteToken(_domain, _issuer, _key, userId, mutedUserId, channelType, channelId, expirationInSeconds);
+        }
+
+        public string GenerateVivoxAccessToken(string vxa, uint vxi, string f, string t, string sub, int expirationInSeconds = 90)
+        {
+            return VivoxTokenGenerator.GenerateVivoxAccessToken(_issuer, _key, vxa, vxi, f, t, sub, expirationInSeconds);
+        }
+
+        public void GetChannelTypeAndId(string channelUri, out VivoxChannelType channelType, out string channelId)
+        {
+            VivoxTokenGenerator.GetChannelTypeAndId(_issuer, channelUri, out channelType, out channelId);
         }
     }
 }
