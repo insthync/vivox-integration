@@ -5,6 +5,7 @@ namespace Insthync.UnityVivoxIntegration
 {
     public class ToggleVivoxMicrophone : MonoBehaviour
     {
+#if !UNITY_SERVER
         public Toggle toggle;
 
         private void Awake()
@@ -31,5 +32,6 @@ namespace Insthync.UnityVivoxIntegration
             else
                 VivoxManager.Instance.MuteMicrophone();
         }
+#endif
     }
 }
