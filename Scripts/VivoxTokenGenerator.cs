@@ -43,12 +43,32 @@ namespace Insthync.UnityVivoxIntegration
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
+        public static string GenerateJoinToken(string domain, string issuer, string key, string userId, string channelUri, int expirationInSeconds = 90)
+        {
+            string vxa = "join";
+            uint vxi = 0;
+            string f = GetUserSIP(domain, issuer, userId);
+            string t = channelUri;
+            string sub = string.Empty;
+            return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
+        }
+
         public static string GenerateJoinMutedToken(string domain, string issuer, string key, string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
             string vxa = "join_muted";
             uint vxi = 0;
             string f = GetUserSIP(domain, issuer, userId);
             string t = GetChannelSIP(domain, issuer, channelType, channelId);
+            string sub = string.Empty;
+            return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
+        }
+
+        public static string GenerateJoinMutedToken(string domain, string issuer, string key, string userId, string channelUri, int expirationInSeconds = 90)
+        {
+            string vxa = "join_muted";
+            uint vxi = 0;
+            string f = GetUserSIP(domain, issuer, userId);
+            string t = channelUri;
             string sub = string.Empty;
             return GenerateVivoxAccessToken(issuer, key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
@@ -141,6 +161,13 @@ namespace Insthync.UnityVivoxIntegration
         private static long ToUnixEpochTime(DateTime dateTime)
         {
             return (long)(dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+        }
+
+        public static void GetChannelTypeAndId(string issuer, string channelUri, out VivoxChannelType channelType, out string channelId)
+        {
+            channelType = channelUri.GetChannelType();
+            string[] splited = channelUri.Split('!');
+            channelId = splited[0].Substring(4 /* SIP: */ + 10 /* Prefix */ + issuer.Length /* Issuer */ + 1 /* . */);
         }
 
         /// <summary>
