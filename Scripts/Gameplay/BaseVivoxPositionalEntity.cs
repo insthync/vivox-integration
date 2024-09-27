@@ -1,10 +1,12 @@
+#if UNITY_EDITOR || !UNITY_SERVER
 using System.Threading.Tasks;
 using Unity.Services.Vivox;
+#endif
 using UnityEngine;
 
 namespace Insthync.UnityVivoxIntegration
 {
-    public abstract class BaseVivoxPositionalEntity : MonoBehaviour
+    public class BaseVivoxPositionalEntity : MonoBehaviour
     {
         public bool isReconnect = true;
         public float reconnectDelay = 10f;
@@ -13,11 +15,13 @@ namespace Insthync.UnityVivoxIntegration
         public string displayName;
         public bool loginOnStart = true;
 
-        private bool _intendedToLogout = false;
-        private bool _isJoined = false;
+        public bool IntendedToLogout { get; protected set; } = false;
+        public bool IsJoined { get; protected set; } = false;
 
-        protected virtual void Start()
+#if UNITY_EDITOR || !UNITY_SERVER
+        protected virtual async void Start()
         {
+            await VivoxManager.Instance.InitializeForClient();
             VivoxService.Instance.LoggedIn += Instance_LoggedIn;
             VivoxService.Instance.LoggedOut += Instance_LoggedOut;
             VivoxService.Instance.ChannelJoined += Instance_ChannelJoined;
@@ -35,9 +39,9 @@ namespace Insthync.UnityVivoxIntegration
             await Logout();
         }
 
-        private void Update()
+        protected virtual void Update()
         {
-            if (!_isJoined)
+            if (!IsJoined)
                 return;
             VivoxService.Instance.Set3DPosition(gameObject, channelName);
         }
@@ -49,7 +53,7 @@ namespace Insthync.UnityVivoxIntegration
 
         public async Task Login()
         {
-            _intendedToLogout = false;
+            IntendedToLogout = false;
             await VivoxService.Instance.LoginAsync(new LoginOptions()
             {
                 PlayerId = playerId,
@@ -59,8 +63,8 @@ namespace Insthync.UnityVivoxIntegration
 
         public async Task Logout()
         {
-            _intendedToLogout = true;
-            _isJoined = false;
+            IntendedToLogout = true;
+            IsJoined = false;
             await VivoxService.Instance.LogoutAsync();
         }
 
@@ -69,32 +73,33 @@ namespace Insthync.UnityVivoxIntegration
             await VivoxService.Instance.JoinPositionalChannelAsync(channelName, ChatCapability.AudioOnly, new Channel3DProperties());
         }
 
-        private async void Instance_LoggedIn()
+        protected async void Instance_LoggedIn()
         {
             await Join();
         }
 
-        private async void Instance_LoggedOut()
+        protected async void Instance_LoggedOut()
         {
-            while (isReconnect && !_intendedToLogout && !VivoxService.Instance.IsLoggedIn)
+            while (isReconnect && !IntendedToLogout && !VivoxService.Instance.IsLoggedIn)
             {
                 await Task.Delay((int)(reconnectDelay * 1000));
-                await Logout();
+                await Login();
             }
         }
 
-        private void Instance_ChannelJoined(string channel)
+        protected void Instance_ChannelJoined(string channel)
         {
             if (!string.Equals(channel, channelName))
                 return;
-            _isJoined = true;
+            IsJoined = true;
         }
 
-        private void Instance_ChannelLeft(string channel)
+        protected void Instance_ChannelLeft(string channel)
         {
             if (!string.Equals(channel, channelName))
                 return;
-            _isJoined = false;
+            IsJoined = false;
         }
+#endif
     }
 }
