@@ -17,25 +17,24 @@ namespace Insthync.UnityVivoxIntegration
 
         public bool IntendedToLogout { get; protected set; } = false;
         public bool IsJoined { get; protected set; } = false;
+        private bool _loggingIn = false;
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        protected virtual async void Start()
+        protected virtual void Start()
         {
-            await VivoxManager.Instance.InitializeForClient();
-            VivoxService.Instance.LoggedIn += Instance_LoggedIn;
-            VivoxService.Instance.LoggedOut += Instance_LoggedOut;
-            VivoxService.Instance.ChannelJoined += Instance_ChannelJoined;
-            VivoxService.Instance.ChannelLeft += Instance_ChannelLeft;
             if (loginOnStart)
                 LoginAndForget();
         }
 
         protected virtual async void OnDestroy()
         {
-            VivoxService.Instance.LoggedIn -= Instance_LoggedIn;
-            VivoxService.Instance.LoggedOut -= Instance_LoggedOut;
-            VivoxService.Instance.ChannelJoined -= Instance_ChannelJoined;
-            VivoxService.Instance.ChannelLeft -= Instance_ChannelLeft;
+            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
+            {
+                VivoxService.Instance.LoggedIn -= Instance_LoggedIn;
+                VivoxService.Instance.LoggedOut -= Instance_LoggedOut;
+                VivoxService.Instance.ChannelJoined -= Instance_ChannelJoined;
+                VivoxService.Instance.ChannelLeft -= Instance_ChannelLeft;
+            }
             await Logout();
         }
 
@@ -53,6 +52,18 @@ namespace Insthync.UnityVivoxIntegration
 
         public async Task Login()
         {
+            if (_loggingIn)
+                return;
+            _loggingIn = true;
+            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.None)
+            {
+                await VivoxManager.Instance.InitializeForClient();
+                VivoxService.Instance.LoggedIn += Instance_LoggedIn;
+                VivoxService.Instance.LoggedOut += Instance_LoggedOut;
+                VivoxService.Instance.ChannelJoined += Instance_ChannelJoined;
+                VivoxService.Instance.ChannelLeft += Instance_ChannelLeft;
+            }
+            _loggingIn = false;
             IntendedToLogout = false;
             await VivoxService.Instance.LoginAsync(new LoginOptions()
             {
@@ -65,7 +76,8 @@ namespace Insthync.UnityVivoxIntegration
         {
             IntendedToLogout = true;
             IsJoined = false;
-            await VivoxService.Instance.LogoutAsync();
+            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
+                await VivoxService.Instance.LogoutAsync();
         }
 
         public async Task Join()
