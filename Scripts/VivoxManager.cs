@@ -87,41 +87,65 @@ namespace Insthync.UnityVivoxIntegration
 
         public string GenerateLoginToken(string userId, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating login token for userId: {userId}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateLoginToken(_domain, _issuer, _key, userId, expirationInSeconds);
         }
 
         public string GenerateJoinToken(string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating join token for userId: {userId}, channelType: {channelType}, channelId: {channelId}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateJoinToken(_domain, _issuer, _key, userId, channelType, channelId, expirationInSeconds);
         }
 
         public string GenerateJoinToken(string userId, string channelUri, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating join token for userId: {userId}, channelUri: {channelUri}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateJoinToken(_domain, _issuer, _key, userId, channelUri, expirationInSeconds);
         }
 
         public string GenerateJoinMutedToken(string userId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating join muted token for userId: {userId}, channelType: {channelType}, channelId: {channelId}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateJoinMutedToken(_domain, _issuer, _key, userId, channelType, channelId, expirationInSeconds);
         }
 
         public string GenerateJoinMutedToken(string userId, string channelUri, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating join muted token for userId: {userId}, channelUri: {channelUri}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateJoinMutedToken(_domain, _issuer, _key, userId, channelUri, expirationInSeconds);
         }
 
         public string GenerateKickToken(string userId, string kickedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating kick token for userId: {userId}, kickedUserId: {kickedUserId}, channelType: {channelType}, channelId: {channelId}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateKickToken(_domain, _issuer, _key, userId, kickedUserId, channelType, channelId, expirationInSeconds);
         }
 
         public string GenerateMuteToken(string userId, string mutedUserId, VivoxChannelType channelType, string channelId, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating mute token for userId: {userId}, mutedUserId: {mutedUserId}, channelType: {channelType}, channelId: {channelId}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateMuteToken(_domain, _issuer, _key, userId, mutedUserId, channelType, channelId, expirationInSeconds);
         }
 
         public string GenerateVivoxAccessToken(string vxa, uint vxi, string f, string t, string sub, int expirationInSeconds = 90)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[VivoxManager] Generating Vivox access token for vxa: {vxa}, vxi: {vxi}, f: {f}, t: {t}, sub: {sub}, domain: {_domain}, issuer: {_issuer}, key: {_key}");
+#endif
             return VivoxTokenGenerator.GenerateVivoxAccessToken(_issuer, _key, vxa, vxi, f, t, sub, expirationInSeconds);
         }
 
