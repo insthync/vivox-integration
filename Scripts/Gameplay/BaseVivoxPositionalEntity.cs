@@ -28,7 +28,7 @@ namespace Insthync.UnityVivoxIntegration
 
         protected virtual async void OnDestroy()
         {
-            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
+            if (VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
             {
                 VivoxService.Instance.LoggedIn -= Instance_LoggedIn;
                 VivoxService.Instance.LoggedOut -= Instance_LoggedOut;
@@ -55,7 +55,7 @@ namespace Insthync.UnityVivoxIntegration
             if (_loggingIn)
                 return;
             _loggingIn = true;
-            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.None)
+            if (VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.None)
             {
                 await VivoxManager.Instance.InitializeForClient();
                 VivoxService.Instance.LoggedIn += Instance_LoggedIn;
@@ -76,7 +76,7 @@ namespace Insthync.UnityVivoxIntegration
         {
             IntendedToLogout = true;
             IsJoined = false;
-            if (VivoxManager.Instance.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
+            if (VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
                 await VivoxService.Instance.LogoutAsync();
         }
 

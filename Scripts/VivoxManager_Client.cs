@@ -18,9 +18,21 @@ namespace Insthync.UnityVivoxIntegration
             Initialized,
         }
 
-        protected InitializeState _initializeState = InitializeState.None;
-        public InitializeState CurrentInitializeState => _initializeState;
-        public event System.Action OnReadyToSetTokenProvider;
+        protected static InitializeState _initializeState = InitializeState.None;
+        public static InitializeState CurrentInitializeState
+        {
+            get => _initializeState;
+            set
+            {
+                if (_initializeState != value)
+                {
+                    _initializeState = value;
+                    OnCurrentInitializeStateChanged?.Invoke();
+                }
+            }
+        }
+        public static event System.Action OnCurrentInitializeStateChanged;
+        public static event System.Action OnReadyToSetTokenProvider;
 
         public async Task InitializeForClient()
         {
@@ -29,9 +41,9 @@ namespace Insthync.UnityVivoxIntegration
             return;
 #endif
             // Keep these codes to make it editable
-            if (_initializeState != InitializeState.None)
+            if (CurrentInitializeState != InitializeState.None)
                 return;
-            _initializeState = InitializeState.Initializing;
+            CurrentInitializeState = InitializeState.Initializing;
             VivoxConfig config = GetComponent<VivoxConfig>();
             if (config != null)
             {
@@ -69,7 +81,7 @@ namespace Insthync.UnityVivoxIntegration
                     await Task.Delay(1000);
                 }
             } while (!_destroyed);
-            _initializeState = InitializeState.Initialized;
+            CurrentInitializeState = InitializeState.Initialized;
         }
 
         public void ToggleMicrophone()
