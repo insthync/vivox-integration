@@ -71,7 +71,7 @@ namespace Insthync.UnityVivoxIntegration
                     Debug.LogException(ex);
                     await Task.Delay(1000);
                 }
-            } while (true);
+            } while (!_destroyed);
             _initializeState = InitializeState.Initialized;
         }
 

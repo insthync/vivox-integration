@@ -20,6 +20,7 @@ namespace Insthync.UnityVivoxIntegration
 
         protected bool _isInitializingServer;
         protected bool _isInitializedServer;
+        protected bool _destroyed;
 
         /// <summary>
         /// Access singleton instance through this propriety.
@@ -59,6 +60,11 @@ namespace Insthync.UnityVivoxIntegration
                     "Multiple VivoxManager detected in the scene. Only one VivoxManager can exist at a time. The duplicate VivoxManager will be destroyed.");
                 Destroy(this);
             }
+        }
+
+        private void OnDestroy()
+        {
+            _destroyed = true;
         }
 
         public async Task InitializeForServer()
