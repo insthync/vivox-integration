@@ -22,7 +22,7 @@ namespace Insthync.UnityVivoxIntegration
         public InitializeState CurrentInitializeState => _initializeState;
         public event System.Action OnReadyToSetTokenProvider;
 
-        public async Task InitializeForClient(bool initializeUnityService = false)
+        public async Task InitializeForClient()
         {
 #if UNITY_SERVER
             // Do nothing !
@@ -44,15 +44,12 @@ namespace Insthync.UnityVivoxIntegration
             {
                 try
                 {
-                    if (initializeUnityService)
+                    if (UnityServices.State != ServicesInitializationState.Initialized)
                     {
                         var options = new InitializationOptions();
                         options.SetVivoxCredentials(_server, _domain, _issuer);
-                        if (UnityServices.State != ServicesInitializationState.Initialized)
-                        {
-                            Debug.Log("Initializing Unity services...");
-                            await UnityServices.InitializeAsync(options);
-                        }
+                        Debug.Log("Initializing Unity services...");
+                        await UnityServices.InitializeAsync(options);
                     }
                     if (VivoxService.Instance == null)
                     {
