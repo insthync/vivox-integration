@@ -13,6 +13,8 @@ namespace Insthync.UnityVivoxIntegration
             if (slider == null)
                 slider = GetComponentInChildren<Slider>();
             slider.onValueChanged.AddListener(OnValueChanged);
+            slider.minValue = -50;
+            slider.maxValue = 50;
             VivoxManager_OnCurrentInitializeStateChanged();
             VivoxManager.OnCurrentInitializeStateChanged += VivoxManager_OnCurrentInitializeStateChanged;
         }
