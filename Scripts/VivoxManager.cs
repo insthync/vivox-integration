@@ -13,6 +13,14 @@ namespace Insthync.UnityVivoxIntegration
         private string _issuer = "";
         [SerializeField]
         private string _key = "";
+        [SerializeField]
+        private string _prefsKeyMicrophoneMuted = "VivoxManager_MicrophoneMuted";
+        [SerializeField]
+        private string _prefsKeySpeakerMuted = "VivoxManager_SpeakerMuted";
+        [SerializeField]
+        private string _prefsKeyMicrophoneVolume = "VivoxManager_MicrophoneVolume";
+        [SerializeField]
+        private string _prefsKeySpeakerVolume = "VivoxManager_SpeakerVolume";
 
         // Check to see if we're about to be destroyed.
         static object m_Lock = new object();
