@@ -4,10 +4,9 @@ namespace Insthync.UnityVivoxIntegration
 {
     public class StatusSpeakerMute : MonoBehaviour
     {
-#if !UNITY_SERVER
         public GameObject[] mutedObjects = new GameObject[0];
         public GameObject[] unmutedObjects = new GameObject[0];
-
+#if !UNITY_SERVER
         void Update()
         {
             bool isMuted = VivoxManager.Instance != null && VivoxManager.Instance.IsSpeakerMuted;

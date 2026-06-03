@@ -8,7 +8,7 @@ namespace Insthync.UnityVivoxIntegration
         public Text text;
         public TMPro.TextMeshProUGUI tmpText;
         public string textFormat = "{0} dB";
-
+#if !UNITY_SERVER
         void Update()
         {
             string value = string.Format(textFormat, VivoxManager.Instance.MicrophoneVolume);
@@ -17,5 +17,6 @@ namespace Insthync.UnityVivoxIntegration
             if (tmpText != null)
                 tmpText.text = value;
         }
+#endif
     }
 }

@@ -5,9 +5,8 @@ namespace Insthync.UnityVivoxIntegration
 {
     public class SliderVivoxMicrophoneVolume : MonoBehaviour
     {
-#if !UNITY_SERVER
         public Slider slider;
-
+#if !UNITY_SERVER
         private void Awake()
         {
             if (slider == null)

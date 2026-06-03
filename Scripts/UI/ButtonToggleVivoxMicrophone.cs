@@ -5,9 +5,8 @@ namespace Insthync.UnityVivoxIntegration
 {
     public class ButtonToggleVivoxMicrophone : MonoBehaviour
     {
-#if !UNITY_SERVER
         public Button button;
-
+#if !UNITY_SERVER
         private void Awake()
         {
             if (button == null)
