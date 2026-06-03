@@ -7,10 +7,11 @@ namespace Insthync.UnityVivoxIntegration
     {
         public Text text;
         public TMPro.TextMeshPro tmpText;
+        public string textFormat = "{0} dB";
 
         void Update()
         {
-            string value = VivoxManager.Instance.SpeakerVolume.ToString("N0");
+            string value = string.Format(textFormat, VivoxManager.Instance.SpeakerVolume);
             if (text != null)
                 text.text = value;
             if (tmpText != null)
