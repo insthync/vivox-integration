@@ -15,6 +15,7 @@ namespace Insthync.UnityVivoxIntegration
             slider.onValueChanged.AddListener(OnValueChanged);
             slider.minValue = -50;
             slider.maxValue = 50;
+            slider.wholeNumbers = true;
             VivoxManager_OnCurrentInitializeStateChanged();
             VivoxManager.OnCurrentInitializeStateChanged += VivoxManager_OnCurrentInitializeStateChanged;
         }
