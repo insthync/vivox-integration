@@ -13,6 +13,8 @@ namespace Insthync.UnityVivoxIntegration
             if (toggle == null)
                 toggle = GetComponentInChildren<Toggle>();
             toggle.onValueChanged.AddListener(OnToggle);
+            VivoxManager_OnCurrentInitializeStateChanged();
+            VivoxManager.OnCurrentInitializeStateChanged += VivoxManager_OnCurrentInitializeStateChanged;
         }
 
         private void OnEnable()
@@ -23,6 +25,7 @@ namespace Insthync.UnityVivoxIntegration
         private void OnDestroy()
         {
             toggle.onValueChanged.RemoveListener(OnToggle);
+            VivoxManager.OnCurrentInitializeStateChanged -= VivoxManager_OnCurrentInitializeStateChanged;
         }
 
         private void OnToggle(bool isOn)
@@ -31,6 +34,13 @@ namespace Insthync.UnityVivoxIntegration
                 VivoxManager.Instance.UnmuteSpeaker();
             else
                 VivoxManager.Instance.MuteSpeaker();
+        }
+
+        private void VivoxManager_OnCurrentInitializeStateChanged()
+        {
+            bool initialized = VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.Initialized;
+            toggle.interactable = initialized;
+            toggle.SetIsOnWithoutNotify(!VivoxManager.Instance.IsSpeakerMuted);
         }
 #endif
     }

@@ -10,14 +10,16 @@ namespace Insthync.UnityVivoxIntegration
 
         void Update()
         {
-            bool isMuted = VivoxManager.Instance.IsMicrophoneMuted;
+            bool isMuted = VivoxManager.Instance != null && VivoxManager.Instance.IsMicrophoneMuted;
             for (int i = 0; i < mutedObjects.Length; ++i)
             {
-                mutedObjects[i].SetActive(isMuted);
+                if (mutedObjects[i].activeSelf != isMuted)
+                    mutedObjects[i].SetActive(isMuted);
             }
             for (int i = 0; i < unmutedObjects.Length; ++i)
             {
-                unmutedObjects[i].SetActive(!isMuted);
+                if (unmutedObjects[i].activeSelf != !isMuted)
+                    unmutedObjects[i].SetActive(!isMuted);
             }
         }
 #endif
