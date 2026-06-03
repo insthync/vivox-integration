@@ -6,7 +6,7 @@ namespace Insthync.UnityVivoxIntegration
     public class TextVivoxSpeakerVolume : MonoBehaviour
     {
         public Text text;
-        public TMPro.TextMeshPro tmpText;
+        public TMPro.TextMeshProUGUI tmpText;
         public string textFormat = "{0} dB";
 
         void Update()
