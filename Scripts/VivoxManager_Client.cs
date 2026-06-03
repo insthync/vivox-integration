@@ -184,6 +184,7 @@ namespace Insthync.UnityVivoxIntegration
         /// <param name="volume"></param>
         public void SetMicrophoneVolume(int volume = 0)
         {
+            volume = Mathf.Clamp(volume, -50, 50);
             PlayerPrefs.SetInt(_prefsKeyMicrophoneVolume, volume);
             PlayerPrefs.Save();
             VivoxService.Instance.SetInputDeviceVolume(volume);
@@ -195,6 +196,7 @@ namespace Insthync.UnityVivoxIntegration
         /// <param name="volume"></param>
         public void SetSpeakerVolume(int volume = 0)
         {
+            volume = Mathf.Clamp(volume, -50, 50);
             PlayerPrefs.SetInt(_prefsKeySpeakerVolume, volume);
             PlayerPrefs.Save();
             VivoxService.Instance.SetOutputDeviceVolume(volume);
