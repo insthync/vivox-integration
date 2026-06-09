@@ -91,8 +91,8 @@ namespace Insthync.UnityVivoxIntegration
                 MuteSpeaker();
             else
                 UnmuteSpeaker();
-            int microphoneVolume = PlayerPrefs.GetInt(_prefsKeyMicrophoneVolume, 0);
-            int speakerVolume = PlayerPrefs.GetInt(_prefsKeySpeakerVolume, 0);
+            int microphoneVolume = PlayerPrefs.GetInt(_prefsKeyMicrophoneVolume, VivoxService.Instance.InputDeviceVolume);
+            int speakerVolume = PlayerPrefs.GetInt(_prefsKeySpeakerVolume, VivoxService.Instance.OutputDeviceVolume);
             SetMicrophoneVolume(microphoneVolume);
             SetSpeakerVolume(speakerVolume);
             CurrentInitializeState = InitializeState.Initialized;
@@ -202,7 +202,7 @@ namespace Insthync.UnityVivoxIntegration
             VivoxService.Instance.SetOutputDeviceVolume(volume);
         }
 
-        public bool IsMicrophoneMuted => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneMuted, 0) == 1 : VivoxService.Instance.IsInputDeviceMuted;
+        public bool IsMicrophoneMuted => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneMuted, 1) == 1 : VivoxService.Instance.IsInputDeviceMuted;
         public bool IsSpeakerMuted => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeySpeakerMuted, 0) == 1 : VivoxService.Instance.IsOutputDeviceMuted;
         public int MicrophoneVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneVolume, 0) : VivoxService.Instance.InputDeviceVolume;
         public int SpeakerVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeySpeakerVolume, 0) : VivoxService.Instance.OutputDeviceVolume;
