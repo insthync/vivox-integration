@@ -56,13 +56,15 @@ namespace Insthync.UnityVivoxIntegration
                 return;
             _loggingIn = true;
             if (VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.None)
-            {
                 await VivoxManager.Instance.InitializeForClient();
-                VivoxService.Instance.LoggedIn += Instance_LoggedIn;
-                VivoxService.Instance.LoggedOut += Instance_LoggedOut;
-                VivoxService.Instance.ChannelJoined += Instance_ChannelJoined;
-                VivoxService.Instance.ChannelLeft += Instance_ChannelLeft;
-            }
+            VivoxService.Instance.LoggedIn -= Instance_LoggedIn;
+            VivoxService.Instance.LoggedOut -= Instance_LoggedOut;
+            VivoxService.Instance.ChannelJoined -= Instance_ChannelJoined;
+            VivoxService.Instance.ChannelLeft -= Instance_ChannelLeft;
+            VivoxService.Instance.LoggedIn += Instance_LoggedIn;
+            VivoxService.Instance.LoggedOut += Instance_LoggedOut;
+            VivoxService.Instance.ChannelJoined += Instance_ChannelJoined;
+            VivoxService.Instance.ChannelLeft += Instance_ChannelLeft;
             _loggingIn = false;
             IntendedToLogout = false;
             await VivoxService.Instance.LoginAsync(new LoginOptions()
