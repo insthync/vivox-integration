@@ -163,11 +163,22 @@ namespace Insthync.UnityVivoxIntegration
             return (long)(dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
         }
 
+        /// <summary>
+        /// https://docs.unity.com/en-us/vivox-core/server-to-server-api-reference/uri/channel-uri
+        /// </summary>
+        /// <param name="issuer"></param>
+        /// <param name="channelUri"></param>
+        /// <param name="channelType"></param>
+        /// <param name="channelId"></param>
         public static void GetChannelTypeAndId(string issuer, string channelUri, out VivoxChannelType channelType, out string channelId)
         {
             channelType = channelUri.GetChannelType();
-            string[] splited = channelUri.Split('!');
-            channelId = splited[0].Substring(4 /* SIP: */ + 10 /* Prefix */ + issuer.Length /* Issuer */ + 1 /* . */);
+            string splited = channelUri.Split('@')[0].Split('!')[0];
+            channelId = splited.Substring(
+                4 /* sip: */
+                + 10 /* Prefix (Such as confctl-g-) */
+                + issuer.Length /* Issuer */
+                + 1 /* . */);
         }
 
         /// <summary>
