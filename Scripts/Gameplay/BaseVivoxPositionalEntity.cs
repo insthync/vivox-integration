@@ -67,7 +67,7 @@ namespace Insthync.UnityVivoxIntegration
             VivoxService.Instance.ChannelLeft += Instance_ChannelLeft;
             _loggingIn = false;
             IntendedToLogout = false;
-            await VivoxService.Instance.LoginAsync(new LoginOptions()
+            await VivoxManager.LoginAsync(new LoginOptions()
             {
                 PlayerId = playerId,
                 DisplayName = displayName,
@@ -79,7 +79,7 @@ namespace Insthync.UnityVivoxIntegration
             IntendedToLogout = true;
             IsJoined = false;
             if (VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.Initialized)
-                await VivoxService.Instance.LogoutAsync();
+                await VivoxManager.LogoutAsync();
         }
 
         public async Task Join()

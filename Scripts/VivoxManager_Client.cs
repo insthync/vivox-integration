@@ -9,7 +9,7 @@ using UnityEngine.Android;
 
 namespace Insthync.UnityVivoxIntegration
 {
-    public partial class VivoxManager
+    public partial class VivoxManager : IVivoxTokenProvider
     {
         public enum InitializeState
         {
@@ -31,13 +31,15 @@ namespace Insthync.UnityVivoxIntegration
                 }
             }
         }
-        public static event System.Action OnCurrentInitializeStateChanged;
-        public static event System.Action OnReadyToSetTokenProvider;
+        public static event System.Action OnCurrentInitializeStateChanged = null;
+        public static IVivoxTokenProvider TokenProvider { get; set; } = null;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
             _initializeState = InitializeState.None;
+            OnCurrentInitializeStateChanged = null;
+            TokenProvider = null;
         }
 
         public async Task InitializeForClient()
@@ -76,7 +78,7 @@ namespace Insthync.UnityVivoxIntegration
                         continue;
                     }
                     Debug.Log("Initializing Vivox service...");
-                    OnReadyToSetTokenProvider?.Invoke();
+                    VivoxService.Instance.SetTokenProvider(this);
                     await VivoxService.Instance.InitializeAsync();
                     Debug.Log("Unity and Vivox services are initialized.");
                     break;
@@ -239,6 +241,25 @@ namespace Insthync.UnityVivoxIntegration
         public bool IsSpeakerMuted => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeySpeakerMuted, 0) == 1 : VivoxService.Instance.IsOutputDeviceMuted;
         public int MicrophoneVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneVolume, 0) : VivoxService.Instance.InputDeviceVolume;
         public int SpeakerVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeySpeakerVolume, 0) : VivoxService.Instance.OutputDeviceVolume;
+
+        public static Task LoginAsync(LoginOptions loginOptions)
+        {
+            return VivoxService.Instance.LoginAsync(loginOptions);
+        }
+
+        public static Task LogoutAsync()
+        {
+            return VivoxService.Instance.LogoutAsync();
+        }
+
+        public static bool IsLoggedIn => VivoxService.Instance.IsLoggedIn;
+
+        public Task<string> GetTokenAsync(string issuer = null, System.TimeSpan? expiration = null, string targetUserUri = null, string action = null, string channelUri = null, string fromUserUri = null, string realm = null)
+        {
+            if (TokenProvider == null)
+                return null;
+            return TokenProvider.GetTokenAsync(issuer, expiration, targetUserUri, action, channelUri, fromUserUri, realm);
+        }
     }
 }
 #endif
