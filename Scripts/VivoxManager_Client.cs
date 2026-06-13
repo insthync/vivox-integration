@@ -34,6 +34,12 @@ namespace Insthync.UnityVivoxIntegration
         public static event System.Action OnCurrentInitializeStateChanged;
         public static event System.Action OnReadyToSetTokenProvider;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Initialize()
+        {
+            _initializeState = InitializeState.None;
+        }
+
         public async Task InitializeForClient()
         {
 #if UNITY_SERVER
