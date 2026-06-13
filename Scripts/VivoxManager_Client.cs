@@ -83,10 +83,13 @@ namespace Insthync.UnityVivoxIntegration
             } while (!_destroyed);
             bool isMicrophoneMuted = PlayerPrefs.GetInt(_prefsKeyMicrophoneMuted, VivoxService.Instance.IsInputDeviceMuted ? 1 : 0) == 1;
             bool isSpeakerMuted = PlayerPrefs.GetInt(_prefsKeySpeakerMuted, VivoxService.Instance.IsOutputDeviceMuted ? 1 : 0) == 1;
-            if (isMicrophoneMuted)
-                MuteMicrophone();
-            else
-                UnmuteMicrophone();
+            if (HasPermissions())
+            {
+                if (isMicrophoneMuted)
+                    MuteMicrophone();
+                else
+                    UnmuteMicrophone();
+            }
             if (isSpeakerMuted)
                 MuteSpeaker();
             else
@@ -116,19 +119,21 @@ namespace Insthync.UnityVivoxIntegration
 
         public void MuteMicrophone()
         {
-            PlayerPrefs.SetInt(_prefsKeyMicrophoneMuted, 1);
-            PlayerPrefs.Save();
             VivoxService.Instance.MuteInputDevice();
+            SaveMicrophoneMuteState();
         }
 
         public void UnmuteMicrophone()
         {
-            PlayerPrefs.SetInt(_prefsKeyMicrophoneMuted, 0);
-            PlayerPrefs.Save();
             if (!HasPermissions())
+            {
                 RequestMicrophonePermissionToUnmute();
+            }
             else
+            {
                 VivoxService.Instance.UnmuteInputDevice();
+                SaveMicrophoneMuteState();
+            }
         }
 
         private bool HasPermissions()
@@ -155,27 +160,27 @@ namespace Insthync.UnityVivoxIntegration
 #if UNITY_ANDROID
         private void Callbacks_PermissionGranted(string permissionName)
         {
-            UnmuteMicrophone();
+            VivoxService.Instance.UnmuteInputDevice();
+            SaveMicrophoneMuteState();
         }
 #else
         private void AsyncOp_completed_Unmute(AsyncOperation asyncOp)
         {
-            UnmuteMicrophone();
+            VivoxService.Instance.UnmuteInputDevice();
+            SaveMicrophoneMuteState();
         }
 #endif
 
         public void MuteSpeaker()
         {
-            PlayerPrefs.SetInt(_prefsKeySpeakerMuted, 1);
-            PlayerPrefs.Save();
             VivoxService.Instance.MuteOutputDevice();
+            SaveSpeakerMuteState();
         }
 
         public void UnmuteSpeaker()
         {
-            PlayerPrefs.SetInt(_prefsKeySpeakerMuted, 0);
-            PlayerPrefs.Save();
             VivoxService.Instance.UnmuteOutputDevice();
+            SaveSpeakerMuteState();
         }
 
         /// <summary>
@@ -185,9 +190,8 @@ namespace Insthync.UnityVivoxIntegration
         public void SetMicrophoneVolume(int volume = 0)
         {
             volume = Mathf.Clamp(volume, -50, 50);
-            PlayerPrefs.SetInt(_prefsKeyMicrophoneVolume, volume);
-            PlayerPrefs.Save();
             VivoxService.Instance.SetInputDeviceVolume(volume);
+            SaveMicrophoneVolume();
         }
 
         /// <summary>
@@ -197,9 +201,32 @@ namespace Insthync.UnityVivoxIntegration
         public void SetSpeakerVolume(int volume = 0)
         {
             volume = Mathf.Clamp(volume, -50, 50);
-            PlayerPrefs.SetInt(_prefsKeySpeakerVolume, volume);
-            PlayerPrefs.Save();
             VivoxService.Instance.SetOutputDeviceVolume(volume);
+            SaveSpeakerVolume();
+        }
+
+        public void SaveMicrophoneMuteState()
+        {
+            PlayerPrefs.SetInt(_prefsKeyMicrophoneMuted, VivoxService.Instance.IsInputDeviceMuted ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SaveSpeakerMuteState()
+        {
+            PlayerPrefs.SetInt(_prefsKeyMicrophoneMuted, VivoxService.Instance.IsOutputDeviceMuted ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        public void SaveMicrophoneVolume()
+        {
+            PlayerPrefs.SetInt(_prefsKeySpeakerVolume, VivoxService.Instance.InputDeviceVolume);
+            PlayerPrefs.Save();
+        }
+
+        public void SaveSpeakerVolume()
+        {
+            PlayerPrefs.SetInt(_prefsKeySpeakerVolume, VivoxService.Instance.OutputDeviceVolume);
+            PlayerPrefs.Save();
         }
 
         public bool IsMicrophoneMuted => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneMuted, 1) == 1 : VivoxService.Instance.IsInputDeviceMuted;
