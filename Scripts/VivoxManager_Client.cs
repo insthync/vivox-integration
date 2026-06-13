@@ -242,17 +242,21 @@ namespace Insthync.UnityVivoxIntegration
         public int MicrophoneVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeyMicrophoneVolume, 0) : VivoxService.Instance.InputDeviceVolume;
         public int SpeakerVolume => VivoxService.Instance == null ? PlayerPrefs.GetInt(_prefsKeySpeakerVolume, 0) : VivoxService.Instance.OutputDeviceVolume;
 
-        public static Task LoginAsync(LoginOptions loginOptions)
+        public static async Task LoginAsync(LoginOptions loginOptions)
         {
-            return VivoxService.Instance.LoginAsync(loginOptions);
+            if (CurrentInitializeState != InitializeState.Initialized)
+                return;
+            await VivoxService.Instance.LoginAsync(loginOptions);
         }
 
-        public static Task LogoutAsync()
+        public static async Task LogoutAsync()
         {
-            return VivoxService.Instance.LogoutAsync();
+            if (CurrentInitializeState != InitializeState.Initialized)
+                return;
+            await VivoxService.Instance.LogoutAsync();
         }
 
-        public static bool IsLoggedIn => VivoxService.Instance.IsLoggedIn;
+        public static bool IsLoggedIn => VivoxService.Instance != null && VivoxService.Instance.IsLoggedIn;
 
         public Task<string> GetTokenAsync(string issuer = null, System.TimeSpan? expiration = null, string targetUserUri = null, string action = null, string channelUri = null, string fromUserUri = null, string realm = null)
         {
