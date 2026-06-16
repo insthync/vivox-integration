@@ -168,12 +168,24 @@ namespace Insthync.UnityVivoxIntegration
 #if UNITY_ANDROID
         private void Callbacks_PermissionGranted(string permissionName)
         {
+            if (!string.Equals(permissionName, Permission.Microphone))
+                return;
+            if (!HasPermissions())
+            {
+                Debug.LogError($"No microphone permission after requested, Platform: {Application.platform}");
+                return;
+            }
             VivoxService.Instance.UnmuteInputDevice();
             SaveMicrophoneMuteState();
         }
 #else
         private void AsyncOp_completed_Unmute(AsyncOperation asyncOp)
         {
+            if (!HasPermissions())
+            {
+                Debug.LogError($"No microphone permission after requested, Platform: {Application.platform}");
+                return;
+            }
             VivoxService.Instance.UnmuteInputDevice();
             SaveMicrophoneMuteState();
         }
