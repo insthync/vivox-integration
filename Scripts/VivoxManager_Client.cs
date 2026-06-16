@@ -193,13 +193,15 @@ namespace Insthync.UnityVivoxIntegration
 
         public void MuteSpeaker()
         {
-            VivoxService.Instance.MuteOutputDevice();
+            if (VivoxService.Instance != null)
+                VivoxService.Instance.MuteOutputDevice();
             SaveSpeakerMuteState();
         }
 
         public void UnmuteSpeaker()
         {
-            VivoxService.Instance.UnmuteOutputDevice();
+            if (VivoxService.Instance != null)
+                VivoxService.Instance.UnmuteOutputDevice();
             SaveSpeakerMuteState();
         }
 
@@ -210,7 +212,8 @@ namespace Insthync.UnityVivoxIntegration
         public void SetMicrophoneVolume(int volume = 0)
         {
             volume = Mathf.Clamp(volume, -50, 50);
-            VivoxService.Instance.SetInputDeviceVolume(volume);
+            if (VivoxService.Instance != null)
+                VivoxService.Instance.SetInputDeviceVolume(volume);
             SaveMicrophoneVolume();
         }
 
@@ -221,7 +224,8 @@ namespace Insthync.UnityVivoxIntegration
         public void SetSpeakerVolume(int volume = 0)
         {
             volume = Mathf.Clamp(volume, -50, 50);
-            VivoxService.Instance.SetOutputDeviceVolume(volume);
+            if (VivoxService.Instance != null)
+                VivoxService.Instance.SetOutputDeviceVolume(volume);
             SaveSpeakerVolume();
         }
 
@@ -233,13 +237,13 @@ namespace Insthync.UnityVivoxIntegration
 
         public void SaveSpeakerMuteState()
         {
-            PlayerPrefs.SetInt(_prefsKeyMicrophoneMuted, VivoxService.Instance.IsOutputDeviceMuted ? 1 : 0);
+            PlayerPrefs.SetInt(_prefsKeySpeakerMuted, VivoxService.Instance.IsOutputDeviceMuted ? 1 : 0);
             PlayerPrefs.Save();
         }
 
         public void SaveMicrophoneVolume()
         {
-            PlayerPrefs.SetInt(_prefsKeySpeakerVolume, VivoxService.Instance.InputDeviceVolume);
+            PlayerPrefs.SetInt(_prefsKeyMicrophoneVolume, VivoxService.Instance.InputDeviceVolume);
             PlayerPrefs.Save();
         }
 
