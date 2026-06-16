@@ -37,8 +37,6 @@ namespace Insthync.UnityVivoxIntegration
 
         private void VivoxManager_OnCurrentInitializeStateChanged()
         {
-            bool initialized = VivoxManager.CurrentInitializeState == VivoxManager.InitializeState.Initialized;
-            slider.interactable = initialized;
             slider.SetValueWithoutNotify(VivoxManager.Instance.SpeakerVolume);
         }
 #endif
