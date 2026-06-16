@@ -148,6 +148,8 @@ namespace Insthync.UnityVivoxIntegration
 
         private bool HasPermissions()
         {
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+                return true;
             if (_permissionGranted)
                 return true;
 #if UNITY_ANDROID
@@ -159,6 +161,8 @@ namespace Insthync.UnityVivoxIntegration
 
         private void RequestMicrophonePermissionToUnmute()
         {
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+                return;
             if (_permissionGranted)
                 return;
 #if UNITY_ANDROID
