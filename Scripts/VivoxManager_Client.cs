@@ -33,6 +33,7 @@ namespace Insthync.UnityVivoxIntegration
         }
         public static event System.Action OnCurrentInitializeStateChanged = null;
         public static IVivoxTokenProvider TokenProvider { get; set; } = null;
+        private static bool _permissionGranted = false;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
@@ -40,6 +41,7 @@ namespace Insthync.UnityVivoxIntegration
             _initializeState = InitializeState.None;
             OnCurrentInitializeStateChanged = null;
             TokenProvider = null;
+            _permissionGranted = false;
         }
 
         public async Task InitializeForClient()
@@ -146,6 +148,8 @@ namespace Insthync.UnityVivoxIntegration
 
         private bool HasPermissions()
         {
+            if (_permissionGranted)
+                return true;
 #if UNITY_ANDROID
             return Permission.HasUserAuthorizedPermission(Permission.Microphone);
 #else
@@ -155,6 +159,8 @@ namespace Insthync.UnityVivoxIntegration
 
         private void RequestMicrophonePermissionToUnmute()
         {
+            if (_permissionGranted)
+                return;
 #if UNITY_ANDROID
             PermissionCallbacks callbacks = new PermissionCallbacks();
             callbacks.PermissionGranted += Callbacks_PermissionGranted;
@@ -175,6 +181,7 @@ namespace Insthync.UnityVivoxIntegration
                 Debug.LogError($"No microphone permission after requested, Platform: {Application.platform}");
                 return;
             }
+            _permissionGranted = true;
             VivoxService.Instance.UnmuteInputDevice();
             SaveMicrophoneMuteState();
         }
@@ -186,6 +193,7 @@ namespace Insthync.UnityVivoxIntegration
                 Debug.LogError($"No microphone permission after requested, Platform: {Application.platform}");
                 return;
             }
+            _permissionGranted = true;
             VivoxService.Instance.UnmuteInputDevice();
             SaveMicrophoneMuteState();
         }
