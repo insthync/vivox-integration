@@ -24,6 +24,7 @@ namespace Insthync.UnityVivoxIntegration
         private void OnDestroy()
         {
             toggle.onValueChanged.RemoveListener(OnToggle);
+            VivoxManager.OnCurrentInitializeStateChanged -= VivoxManager_OnCurrentInitializeStateChanged;
         }
 
         private void OnToggle(bool isOn)
