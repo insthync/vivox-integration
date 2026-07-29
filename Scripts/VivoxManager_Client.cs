@@ -35,15 +35,6 @@ namespace Insthync.UnityVivoxIntegration
         public static IVivoxTokenProvider TokenProvider { get; set; } = null;
         private static bool _permissionGranted = false;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Initialize()
-        {
-            _initializeState = InitializeState.None;
-            OnCurrentInitializeStateChanged = null;
-            TokenProvider = null;
-            _permissionGranted = false;
-        }
-
         public async Task InitializeForClient()
         {
 #if UNITY_SERVER
@@ -52,7 +43,14 @@ namespace Insthync.UnityVivoxIntegration
 #endif
             // Keep these codes to make it editable
             if (CurrentInitializeState != InitializeState.None)
+            {
+                // Wait until initializing done
+                while (CurrentInitializeState != InitializeState.None)
+                {
+                    await Task.Yield();
+                }
                 return;
+            }
             CurrentInitializeState = InitializeState.Initializing;
             VivoxConfig config = GetComponent<VivoxConfig>();
             if (config != null)

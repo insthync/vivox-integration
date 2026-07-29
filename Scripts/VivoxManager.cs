@@ -7,12 +7,16 @@ namespace Insthync.UnityVivoxIntegration
     {
         [SerializeField]
         private string _server = "";
+        public string ConfigServer => _server;
         [SerializeField]
         private string _domain = "";
+        public string ConfigDomain => _domain;
         [SerializeField]
         private string _issuer = "";
+        public string ConfigIssuer => _issuer;
         [SerializeField]
         private string _key = "";
+        public string ConfigKey => _key;
         [SerializeField]
         private string _prefsKeyMicrophoneMuted = "VivoxManager_MicrophoneMuted";
         [SerializeField]
@@ -23,8 +27,8 @@ namespace Insthync.UnityVivoxIntegration
         private string _prefsKeySpeakerVolume = "VivoxManager_SpeakerVolume";
 
         // Check to see if we're about to be destroyed.
-        static object m_Lock = new object();
-        static VivoxManager m_Instance;
+        private static readonly object m_Lock = new object();
+        private static VivoxManager m_Instance;
 
         protected bool _isInitializingServer;
         protected bool _isInitializedServer;
@@ -60,6 +64,18 @@ namespace Insthync.UnityVivoxIntegration
             }
         }
 
+        [RuntimeInitializeOnLoadMethod]
+        public static void Initialize()
+        {
+            m_Instance = null;
+#if UNITY_EDITOR || !UNITY_SERVER
+            _initializeState = InitializeState.None;
+            OnCurrentInitializeStateChanged = null;
+            TokenProvider = null;
+            _permissionGranted = false;
+#endif
+        }
+
         private void Awake()
         {
             if (m_Instance != this && m_Instance != null)
@@ -77,8 +93,20 @@ namespace Insthync.UnityVivoxIntegration
 
         public async Task InitializeForServer()
         {
-            if (_isInitializedServer || _isInitializingServer)
+            if (_isInitializedServer)
+            {
+                // Initialized, skip it
                 return;
+            }
+            if (_isInitializingServer)
+            {
+                // Wait until initializing done
+                while (_isInitializingServer)
+                {
+                    await Task.Yield();
+                }
+                return;
+            }
             _isInitializingServer = true;
             VivoxConfig config = GetComponent<VivoxConfig>();
             if (config != null)
