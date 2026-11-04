@@ -11,6 +11,11 @@ namespace Insthync.UnityVivoxIntegration
         {
             if (button == null)
                 button = GetComponentInChildren<Button>();
+            if (button == null)
+            {
+                enabled = false;
+                return;
+            }
             button.onClick.AddListener(OnClick);
             VivoxManager_OnCurrentInitializeStateChanged();
             VivoxManager.OnCurrentInitializeStateChanged += VivoxManager_OnCurrentInitializeStateChanged;
