@@ -14,10 +14,20 @@ namespace Insthync.UnityVivoxIntegration
         public string playerId;
         public string displayName;
         public bool loginOnStart = true;
+        [Tooltip("Minimum seconds between 3D position updates sent to Vivox. Every call allocates a request, so this must not run every frame.")]
+        public float positionUpdateInterval = 0.3f;
+        [Tooltip("Position change (meters) below which no update is sent")]
+        public float positionUpdateMinDistance = 0.1f;
+        [Tooltip("Facing change (degrees) below which no update is sent")]
+        public float positionUpdateMinAngle = 2f;
 
         public bool IntendedToLogout { get; protected set; } = false;
         public bool IsJoined { get; protected set; } = false;
         private bool _loggingIn = false;
+        private float _nextPositionUpdateTime;
+        private bool _hasSentPosition;
+        private Vector3 _lastSentPosition;
+        private Vector3 _lastSentForward;
 
 #if UNITY_EDITOR || !UNITY_SERVER
         protected virtual void Start()
@@ -40,9 +50,30 @@ namespace Insthync.UnityVivoxIntegration
 
         protected virtual void Update()
         {
-            if (!IsJoined)
+            if (!IsJoined || !ShouldSendPosition(transform))
                 return;
             VivoxService.Instance.Set3DPosition(gameObject, channelName);
+        }
+
+        /// <summary>
+        /// Throttles 3D position updates: at most once per <see cref="positionUpdateInterval"/>, and only when the
+        /// entity moved or turned since the last sent update. Same rule as VivoxTokenProvider.
+        /// </summary>
+        private bool ShouldSendPosition(Transform entity)
+        {
+            if (Time.unscaledTime < _nextPositionUpdateTime)
+                return false;
+            Vector3 position = entity.position;
+            Vector3 forward = entity.forward;
+            if (_hasSentPosition &&
+                (position - _lastSentPosition).sqrMagnitude < positionUpdateMinDistance * positionUpdateMinDistance &&
+                Vector3.Angle(forward, _lastSentForward) < positionUpdateMinAngle)
+                return false;
+            _nextPositionUpdateTime = Time.unscaledTime + positionUpdateInterval;
+            _hasSentPosition = true;
+            _lastSentPosition = position;
+            _lastSentForward = forward;
+            return true;
         }
 
         public async void LoginAndForget()
@@ -106,6 +137,9 @@ namespace Insthync.UnityVivoxIntegration
             if (!string.Equals(channel, channelName))
                 return;
             IsJoined = true;
+            // Send the first position right away after (re)joining
+            _hasSentPosition = false;
+            _nextPositionUpdateTime = 0f;
         }
 
         protected void Instance_ChannelLeft(string channel)
